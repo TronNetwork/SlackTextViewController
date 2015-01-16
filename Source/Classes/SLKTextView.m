@@ -69,7 +69,7 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
 {
     self.placeholderColor = [UIColor lightGrayColor];
     self.pastableMediaTypes = SLKPastableMediaTypeNone;
-    
+
     self.font = [UIFont systemFontOfSize:14.0];
     self.editable = YES;
     self.selectable = YES;
@@ -77,12 +77,12 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
     self.scrollsToTop = NO;
     self.directionalLockEnabled = YES;
     self.dataDetectorTypes = UIDataDetectorTypeNone;
-    
+
     // UITextView notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didBeginEditing:) name:UITextViewTextDidBeginEditingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didChangeText:) name:UITextViewTextDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEndEditing:) name:UITextViewTextDidEndEditingNotification object:nil];
-    
+
     [self addObserver:self forKeyPath:NSStringFromSelector(@selector(contentSize)) options:NSKeyValueObservingOptionNew context:NULL];
 }
 
@@ -92,9 +92,9 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
 - (void)drawRect:(CGRect)rect
 {
     [super drawRect:rect];
-    
+
     self.placeholderLabel.hidden = [self shouldHidePlaceholder];
-    self.placeholderLabel.frame = [self placeholderRectForBounds:self.bounds];
+//    self.placeholderLabel.frame = [self placeholderRectForBounds:self.bounds];
     [self sendSubviewToBack:self.placeholderLabel];
 }
 
@@ -118,7 +118,7 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
 {
     if (!_placeholderLabel)
     {
-        _placeholderLabel = [UILabel new];
+        _placeholderLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 120, 32)];
         _placeholderLabel.clipsToBounds = NO;
         _placeholderLabel.autoresizesSubviews = NO;
         _placeholderLabel.numberOfLines = 1;
@@ -126,7 +126,7 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
         _placeholderLabel.backgroundColor = [UIColor clearColor];
         _placeholderLabel.textColor = self.placeholderColor;
         _placeholderLabel.hidden = YES;
-        
+
         [self addSubview:_placeholderLabel];
     }
     return _placeholderLabel;
@@ -165,7 +165,7 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
     if (data && [data isKindOfClass:[NSData class]])
     {
         SLKPastableMediaType mediaType = SLKPastableMediaTypeFromNSString(contentType);
-        
+
         NSDictionary *userInfo = @{SLKTextViewPastedItemContentType: contentType,
                                    SLKTextViewPastedItemMediaType: @(mediaType),
                                    SLKTextViewPastedItemData: data};
@@ -177,7 +177,7 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
     if ([[UIPasteboard generalPasteboard] string]) {
         return [[UIPasteboard generalPasteboard] string];
     }
-    
+
     return nil;
 }
 
@@ -194,11 +194,11 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
 {
     NSArray *pasteboardTypes = [[UIPasteboard generalPasteboard] pasteboardTypes];
     NSMutableArray *subpredicates = [NSMutableArray new];
-    
+
     for (NSString *type in [self supportedMediaTypes]) {
         [subpredicates addObject:[NSPredicate predicateWithFormat:@"SELF == %@", type]];
     }
-    
+
     return [[pasteboardTypes filteredArrayUsingPredicate:[NSCompoundPredicate orPredicateWithSubpredicates:subpredicates]] firstObject];
 }
 
@@ -207,9 +207,9 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
     if (self.pastableMediaTypes == SLKPastableMediaTypeNone) {
         return nil;
     }
-    
+
     NSMutableArray *types = [NSMutableArray new];
-    
+
     if (self.pastableMediaTypes & SLKPastableMediaTypePNG) {
         [types addObject:NSStringFromSLKPastableMediaType(SLKPastableMediaTypePNG)];
     }
@@ -228,12 +228,12 @@ NSString * const SLKTextViewPastedItemData =                    @"SLKTextViewPas
     if (self.pastableMediaTypes & SLKPastableMediaTypePassbook) {
         [types addObject:NSStringFromSLKPastableMediaType(SLKPastableMediaTypePassbook)];
     }
-    
+
     if (self.pastableMediaTypes & SLKPastableMediaTypeImages) {
         [types addObject:NSStringFromSLKPastableMediaType(SLKPastableMediaTypeImages)];
     }
-    
-    
+
+
     return types;
 }
 
@@ -260,7 +260,7 @@ NSString *NSStringFromSLKPastableMediaType(SLKPastableMediaType type)
     if (type == SLKPastableMediaTypeImages) {
         return @"com.apple.uikit.image";
     }
-    
+
     return nil;
 }
 
@@ -312,7 +312,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     CGFloat padding = self.textContainer.lineFragmentPadding;
     rect.origin.x += padding;
     rect.size.width -= padding * 2.0f;
-    
+
     return rect;
 }
 
@@ -336,9 +336,9 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 {
     // Registers for undo management
     [self prepareForUndo:@"Text Set"];
-    
+
     [super setText:text];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:UITextViewTextDidChangeNotification object:self];
 }
 
@@ -346,7 +346,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 {
     // Registers for undo management
     [self prepareForUndo:@"Attributed Text Set"];
-    
+
     [super setAttributedText:attributedText];
 }
 
@@ -356,7 +356,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     UIMenuItem *undo = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Undo", nil) action:@selector(undo:)];
     UIMenuItem *redo = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Redo", nil) action:@selector(redo:)];
     [[UIMenuController sharedMenuController] setMenuItems:@[undo,redo]];
-    
+
     return [super canBecomeFirstResponder];
 }
 
@@ -369,7 +369,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 {
     // Removes undo/redo items
     [[UIMenuController sharedMenuController] setMenuItems:@[]];
-    
+
     return [super canResignFirstResponder];
 }
 
@@ -379,11 +379,11 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
-{    
+{
     if (action == @selector(delete:)) {
         return NO;
     }
-    
+
     if ((action == @selector(copy:) || action == @selector(cut:))
         && self.selectedRange.length > 0) {
         return YES;
@@ -392,19 +392,19 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (action == @selector(paste:) && [self isPasteboardItemSupported]) {
         return YES;
     }
-    
+
     if ((action == @selector(undo:) && ![self.undoManager canUndo]) ||
         (action == @selector(redo:) && ![self.undoManager canRedo])) {
         return NO;
     }
-    
+
     return [super canPerformAction:action withSender:sender];
 }
 
 - (void)paste:(id)sender
 {
     id pastedItem = [self pastedItem];
-    
+
     if ([pastedItem isKindOfClass:[NSDictionary class]])
     {
         [[NSNotificationCenter defaultCenter] postNotificationName:SLKTextViewDidPasteItemNotification object:nil userInfo:pastedItem];
@@ -416,7 +416,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
                 return;
             }
         }
-        
+
         // Inserting the text fixes a UITextView bug whitch automatically scrolls to the bottom
         // and beyond scroll content size sometimes when the text is too long
         [self slk_insertTextAtCaretRange:pastedItem];
@@ -436,7 +436,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 - (void)setFont:(UIFont *)font
 {
     [super setFont:font];
-    
+
     // Updates the placeholder font too
     self.placeholderLabel.font = self.font;
 }
@@ -444,7 +444,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 - (void)setTextAlignment:(NSTextAlignment)textAlignment
 {
     [super setTextAlignment:textAlignment];
-    
+
     // Updates the placeholder text alignment too
     self.placeholderLabel.textAlignment = textAlignment;
 }
@@ -472,10 +472,10 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     }
 
     _typingSuggestionEnabled = enabled;
-    
+
     self.autocorrectionType = enabled ? UITextAutocorrectionTypeDefault : UITextAutocorrectionTypeNo;
     self.spellCheckingType = enabled ? UITextSpellCheckingTypeDefault : UITextSpellCheckingTypeNo;
-    
+
     [self refreshFirstResponder];
 }
 
@@ -484,10 +484,10 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (!self.isFirstResponder) {
         return;
     }
-    
+
     _didNotResignFirstResponder = YES;
     [self resignFirstResponder];
-    
+
     _didNotResignFirstResponder = NO;
     [self becomeFirstResponder];
 }
@@ -495,9 +495,9 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 - (void)refreshInputViews
 {
     _didNotResignFirstResponder = YES;
-    
+
     [super reloadInputViews];
-    
+
     _didNotResignFirstResponder = NO;
 }
 
@@ -509,7 +509,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (![notification.object isEqual:self]) {
         return;
     }
-    
+
     // Do something
 }
 
@@ -518,11 +518,11 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (![notification.object isEqual:self]) {
         return;
     }
-    
+
     if (self.placeholderLabel.hidden != [self shouldHidePlaceholder]) {
         [self setNeedsDisplay];
     }
-    
+
     [self flashScrollIndicatorsIfNeeded];
 }
 
@@ -531,7 +531,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (![notification.object isEqual:self]) {
         return;
     }
-    
+
     // Do something
 }
 
@@ -566,22 +566,22 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (_keyboardCommands) {
         return _keyboardCommands;
     }
-    
+
     _keyboardCommands = @[
          // Return
          [UIKeyCommand keyCommandWithInput:@"\r" modifierFlags:UIKeyModifierShift action:@selector(didPressLineBreakKeys:)],
          [UIKeyCommand keyCommandWithInput:@"\r" modifierFlags:UIKeyModifierAlternate action:@selector(didPressLineBreakKeys:)],
          [UIKeyCommand keyCommandWithInput:@"\r" modifierFlags:UIKeyModifierControl action:@selector(didPressLineBreakKeys:)],
-         
+
          // Undo/Redo
          [UIKeyCommand keyCommandWithInput:@"z" modifierFlags:UIKeyModifierCommand action:@selector(didPressCommandZKeys:)],
          [UIKeyCommand keyCommandWithInput:@"z" modifierFlags:UIKeyModifierShift|UIKeyModifierCommand action:@selector(didPressCommandZKeys:)],
-         
+
          // Up/Down
          [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:0 action:@selector(didPressArrowKey:)],
          [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:0 action:@selector(didPressArrowKey:)]
          ];
-    
+
     return _keyboardCommands;
 }
 
@@ -598,9 +598,9 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 - (void)didPressCommandZKeys:(id)sender
 {
     UIKeyCommand *keyCommand = (UIKeyCommand *)sender;
-    
+
     if ((keyCommand.modifierFlags & UIKeyModifierShift) > 0) {
-        
+
         if ([self.undoManager canRedo]) {
             [self.undoManager redo];
         }
@@ -617,9 +617,9 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     if (self.text.length == 0 || self.numberOfLines < 2) {
         return;
     }
-    
+
     UIKeyCommand *keyCommand = (UIKeyCommand *)sender;
-    
+
     if ([keyCommand.input isEqualToString:UIKeyInputUpArrow]) {
         [self moveCursorTodirection:UITextLayoutDirectionUp];
     }
@@ -635,20 +635,20 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 - (void)moveCursorTodirection:(UITextLayoutDirection)direction
 {
     UITextPosition *start = (direction == UITextLayoutDirectionUp) ? self.selectedTextRange.start : self.selectedTextRange.end;
-    
+
     if ([self isNewVerticalMovementForPosition:start inDirection:direction]) {
         self.verticalMoveDirection = direction;
         self.verticalMoveStartCaretRect = [self caretRectForPosition:start];
     }
-    
+
     if (start) {
-        
+
         UITextPosition *end = [self closestPositionToPosition:start inDirection:direction];
-        
+
         if (end) {
             self.verticalMoveLastCaretRect = [self caretRectForPosition:end];
             self.selectedTextRange = [self textRangeFromPosition:end toPosition:end];
-            
+
             [self slk_scrollToCaretPositonAnimated:NO];
         }
     }
@@ -658,25 +658,25 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 {
     // Currently only up and down are implemented.
     NSParameterAssert(direction == UITextLayoutDirectionUp || direction == UITextLayoutDirectionDown);
-    
+
     // Translate the vertical direction to a horizontal direction.
     UITextLayoutDirection lookupDirection = (direction == UITextLayoutDirectionUp) ? UITextLayoutDirectionLeft : UITextLayoutDirectionRight;
-    
+
     // Walk one character at a time in `lookupDirection` until the next line is reached.
     UITextPosition *checkPosition = position;
     UITextPosition *closestPosition = position;
     CGRect startingCaretRect = [self caretRectForPosition:position];
     CGRect nextLineCaretRect;
     BOOL isInNextLine = NO;
-    
+
     while (YES) {
         UITextPosition *nextPosition = [self positionFromPosition:checkPosition inDirection:lookupDirection offset:1];
-        
+
         // End of line.
         if (!nextPosition || [self comparePosition:checkPosition toPosition:nextPosition] == NSOrderedSame) {
             break;
         }
-        
+
         checkPosition = nextPosition;
         CGRect checkRect = [self caretRectForPosition:checkPosition];
         if (CGRectGetMidY(startingCaretRect) != CGRectGetMidY(checkRect)) {
@@ -693,7 +693,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
             if (isInNextLine && CGRectGetMidY(checkRect) != CGRectGetMidY(nextLineCaretRect)) {
                 break;
             }
-            
+
             isInNextLine = YES;
             nextLineCaretRect = checkRect;
             closestPosition = checkPosition;
@@ -708,7 +708,7 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
     BOOL noPreviousStartPosition = CGRectEqualToRect(self.verticalMoveStartCaretRect, CGRectZero);
     BOOL caretMovedSinceLastPosition = !CGRectEqualToRect(caretRect, self.verticalMoveLastCaretRect);
     BOOL directionChanged = self.verticalMoveDirection != direction;
-    
+
     BOOL newMovement = noPreviousStartPosition || caretMovedSinceLastPosition || directionChanged;
     return newMovement;
 }
@@ -719,9 +719,9 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+
     [self removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentSize))];
-    
+
     _placeholderLabel = nil;
 }
 
